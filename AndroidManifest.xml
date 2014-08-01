@@ -42,6 +42,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.sparago.udacity.sunshineapp.MainActivity" />
         </activity>
+        <provider
+            android:authorities="org.sparago.udacity.sunshineapp"
+            android:name=".data.WeatherProvider" />
         </application>
 
 </manifest>
