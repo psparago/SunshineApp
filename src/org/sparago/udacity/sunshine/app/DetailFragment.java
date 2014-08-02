@@ -1,4 +1,6 @@
-package org.sparago.udacity.sunshineapp;
+package org.sparago.udacity.sunshine.app;
+
+import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
 import android.os.Bundle;

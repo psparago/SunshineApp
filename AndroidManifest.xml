@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.sparago.udacity.sunshineapp"
+    package="org.sparago.udacity.sunshine.app"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="org.sparago.udacity.sunshine.app.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,23 +27,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name="org.sparago.udacity.sunshine.app.DetailActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="org.sparago.udacity.sunshine.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.sparago.udacity.sunshineapp.MainActivity" />
+                android:value="org.sparago.udacity.sunshine.app.MainActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="org.sparago.udacity.sunshine.app.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="org.sparago.udacity.sunshine.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.sparago.udacity.sunshineapp.MainActivity" />
+                android:value="org.sparago.udacity.sunorg.sparago.udacity.sunshine.app.data.WeatherProvider" />
         </activity>
         <provider
-            android:authorities="org.sparago.udacity.sunshineapp"
+            android:authorities="org.sparago.udacity.sunshine.app"
             android:name=".data.WeatherProvider" />
         </application>
 

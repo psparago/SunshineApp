@@ -1,4 +1,4 @@
-package org.sparago.udacity.sunshineapp.models.weather;
+package org.sparago.udacity.sunshine.app.models.weather;
 
 import java.util.ArrayList;
 import java.util.List;

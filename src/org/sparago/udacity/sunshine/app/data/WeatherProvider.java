@@ -1,6 +1,6 @@
-package org.sparago.udacity.sunshineapp.data;
+package org.sparago.udacity.sunshine.app.data;
 
-import org.sparago.udacity.sunshineapp.data.WeatherContract.LocationEntry;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;

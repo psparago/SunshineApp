@@ -1,11 +1,11 @@
-package org.sparago.udacity.sunshineapp.data;
+package org.sparago.udacity.sunshine.app.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.sparago.udacity.sunshineapp.data.WeatherContract.LocationEntry;
-import org.sparago.udacity.sunshineapp.data.WeatherContract.WeatherEntry;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 
 public class WeatherDbHelper extends SQLiteOpenHelper {
 	// If you change the database schema, you must increment the version number

@@ -1,4 +1,4 @@
-package org.sparago.udacity.sunshineapp;
+package org.sparago.udacity.sunshine.app;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,8 +9,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.sparago.udacity.sunshineapp.models.weather.Day;
-import org.sparago.udacity.sunshineapp.models.weather.WeatherLocation;
+import org.sparago.udacity.sunshine.app.models.weather.Day;
+import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
+import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

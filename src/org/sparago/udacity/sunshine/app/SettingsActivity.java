@@ -1,5 +1,7 @@
-package org.sparago.udacity.sunshineapp;
+package org.sparago.udacity.sunshine.app;
  
+import org.sparago.udacity.sunshine.app.R;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;

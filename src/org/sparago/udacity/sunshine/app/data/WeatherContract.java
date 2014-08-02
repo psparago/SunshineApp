@@ -1,30 +1,30 @@
-package org.sparago.udacity.sunshineapp.data;
+package org.sparago.udacity.sunshine.app.data;
 
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
 // WEATHER (dir - list of items)
-// content://org.sparago.udacity.sunshineapp/weather
+// content://org.sparago.udacity.sunshine.app/weather
 
 // WEATHER_WITH_LOCATION (dir - list of items)
-// content://org.sparago.udacity.sunshineapp/weather/[LOCATION_QUERY]
+// content://org.sparago.udacity.sunshine.app/weather/[LOCATION_QUERY]
 
 // WEATHER_WITH_LOCATION_AND_DATE (item)
-// content://org.sparago.udacity.sunshineapp/weather/[LOCATION_QUERY]/[DATE]
+// content://org.sparago.udacity.sunshine.app/weather/[LOCATION_QUERY]/[DATE]
 
 // LOCATION (dir - list of items)
-// content://org.sparago.udacity.sunshineapp/location
+// content://org.sparago.udacity.sunshine.app/location
 
 // LOCATION_ID (item)
-// content://org.sparago.udacity.sunshineapp/location/[LOCATION_QUERY]
+// content://org.sparago.udacity.sunshine.app/location/[LOCATION_QUERY]
 
 // WEATHER_WITH_LOCATION_AND_DATE
-// content://org.sparago.udacity.sunshineapp/weather/[LOCATION_QUERY]/[DATE]
+// content://org.sparago.udacity.sunshine.app/weather/[LOCATION_QUERY]/[DATE]
 
 public class WeatherContract {
 	// Content Authority
-	public static final String CONTENT_AUTHORITY = "org.sparago.udacity.sunshineapp";
+	public static final String CONTENT_AUTHORITY = "org.sparago.udacity.sunshine.app";
 
 	// Base URI
 	public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
