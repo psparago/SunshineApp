@@ -1,26 +1,15 @@
 package org.sparago.udacity.sunshine.app;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.sparago.udacity.sunshine.app.models.weather.Day;
 import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
 import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -116,116 +105,13 @@ public class ForecastFragment extends Fragment {
 	}
 
 	private void updateWeather() {
-		SharedPreferences sharedPref = PreferenceManager
-				.getDefaultSharedPreferences(getActivity());
-		String location = sharedPref.getString(
-				getString(R.string.pref_location_key), "");
-		new FetchWeatherTask().execute(location);
+		String location = Utility.getPreferredLocaiton(getActivity());
+		new FetchWeatherTask(getActivity(), new WeatherLocationObserver() {
+			@Override
+			public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
+				currentLocation = weatherLocation;
+			}
+		}, forecastAdapter).execute(location);
 	}
 
-	protected class FetchWeatherTask extends
-			AsyncTask<String, Void, WeatherLocation> {
-
-		private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
-		public FetchWeatherTask() {
-		}
-
-		@Override
-		protected WeatherLocation doInBackground(String... params) {
-			final String baseUrl = "http://api.openweathermap.org/data/2.5/forecast/daily";
-			final String queryParam = "q";
-			final String modeParam = "mode";
-			final String modeValue = "json";
-			final String unitsParam = "units";
-			final String unitsValue = "metric";
-			final String daysParam = "cnt";
-			final int daysValue = 7;
-
-			WeatherLocation location = null;
-
-			SharedPreferences sharedPref = PreferenceManager
-					.getDefaultSharedPreferences(getActivity());
-			boolean farenheit = sharedPref.getString(
-					getString(R.string.pref_temp_units_key), "").equals("F");
-
-			// These two need to be declared outside the try/catch
-			// so that they can be closed in the finally block.
-			HttpURLConnection urlConnection = null;
-			BufferedReader reader = null;
-
-			try {
-				// Will contain the raw JSON response as a string.
-				String forecastJsonStr = null;
-
-				URL url = new URL(Uri
-						.parse(baseUrl)
-						.buildUpon()
-						.appendQueryParameter(queryParam, params[0])
-						.appendQueryParameter(modeParam, modeValue)
-						.appendQueryParameter(unitsParam, unitsValue)
-						.appendQueryParameter(daysParam,
-								Integer.valueOf(daysValue).toString()).build()
-						.toString());
-
-				// Create the request to OpenWeatherMap, and open the connection
-				urlConnection = (HttpURLConnection) url.openConnection();
-				urlConnection.setRequestMethod("GET");
-				urlConnection.connect();
-
-				// Read the input stream into a String
-				InputStream inputStream = urlConnection.getInputStream();
-				StringBuffer buffer = new StringBuffer();
-				if (inputStream == null) {
-					// Nothing to do.
-					forecastJsonStr = null;
-				}
-				reader = new BufferedReader(new InputStreamReader(inputStream));
-
-				String line;
-				while ((line = reader.readLine()) != null) {
-					// Since it's JSON, adding a newline isn't necessary (it
-					// won't affect parsing)
-					// But it does make debugging a *lot* easier if you print
-					// out the completed
-					// buffer for debugging.
-					buffer.append(line + "\n");
-				}
-
-				if (buffer.length() > 0) {
-					forecastJsonStr = buffer.toString();
-					location = new WeatherLocation();
-					location.parseJson(forecastJsonStr, farenheit);
-				}
-
-			} catch (Exception e) {
-				Log.e(LOG_TAG, "Error getting weather JSON", e);
-			} finally {
-				if (urlConnection != null) {
-					urlConnection.disconnect();
-				}
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (final IOException e) {
-						Log.e(LOG_TAG, "Error closing stream", e);
-					}
-				}
-			}
-
-			return location;
-		}
-
-		@Override
-		protected void onPostExecute(WeatherLocation location) {
-			currentLocation = location;
-			if (currentLocation != null) {
-				forecastAdapter.clear();
-				for (Day d : currentLocation.getDays()) {
-					forecastAdapter.add(d.toString());
-				}
-			}
-		}
-
-	}
 }
