@@ -1,15 +1,23 @@
 package org.sparago.udacity.sunshine.app;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
+import org.sparago.udacity.sunshine.app.data.WeatherContract;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
 import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,9 +29,29 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderCallbacks<Cursor> {
+	private static final int FORECAST_LOADER = 0;
+	
+	// Subset of columns used for the forecast view.
+	private static final String[] FORECAST_COLUMNS = {
+		WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
+		WeatherEntry.COLUMN_DATETEXT,
+		WeatherEntry.COLUMN_SHORT_DESC,
+		WeatherEntry.COLUMN_MAX_TEMP,
+		WeatherEntry.COLUMN_MIN_TEMP,
+		LocationEntry.COLUMN_LOCATION_SETTING
+	};
+	
+	// Indexes of columns above (FORECAST_COLUMNS). Must sync.
+	private static final int COL_WEATHER_ID = 0;
+	private static final int COL_WEATHER_DATE = 1;
+	private static final int COL_WEATHER_DESC = 2;
+	private static final int COL_WEATHER_MAX_TEMP = 3;
+	private static final int COL_WEATHER_MIN_TEMP = 4;
+	private static final int COL_LOCATION_SETTING = 5;
+	
 	protected ArrayAdapter<String> forecastAdapter = null;
-
+	private String mLocation;
 	private WeatherLocation currentLocation;
 
 	public ForecastFragment() {
@@ -35,6 +63,12 @@ public class ForecastFragment extends Fragment {
 		this.setHasOptionsMenu(true);
 	}
 
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -105,13 +139,52 @@ public class ForecastFragment extends Fragment {
 	}
 
 	private void updateWeather() {
-		String location = Utility.getPreferredLocaiton(getActivity());
+		mLocation = Utility.getPreferredLocation(getActivity());
 		new FetchWeatherTask(getActivity(), new WeatherLocationObserver() {
 			@Override
 			public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
 				currentLocation = weatherLocation;
 			}
-		}, forecastAdapter).execute(location);
+		}, forecastAdapter).execute(mLocation);
 	}
 
+    // This is called when a new Loader needs to be created.  This
+    // fragment only uses one loader, so we don't care about checking the id.
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+ 
+        // To only show current and future dates, get the String representation for today,
+        // and filter the query to return weather only for dates after or including today.
+        // Only return data after today.
+        String startDate = WeatherContract.getDbDateString(new Date());
+ 
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+ 
+        mLocation = Utility.getPreferredLocation(getActivity());
+        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
+                mLocation, startDate);
+ 
+        // Now create and return a CursorLoader that will take care of
+        // creating a Cursor for the data being displayed.
+        return new CursorLoader(
+                getActivity(),
+                weatherForLocationUri,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
+    }
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

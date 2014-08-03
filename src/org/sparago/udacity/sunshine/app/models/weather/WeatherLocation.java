@@ -10,8 +10,13 @@ import org.json.JSONObject;
 public class WeatherLocation {
 	private static final String OWM_CITY = "city";
 	private static final String OWM_LIST = "list";
+	private String location;
 	private City city;
 	private List<Day> days = new ArrayList<Day>();
+	
+	public WeatherLocation(String location) {
+		this.setLocation(location);
+	}
 	
 	public void parseJson(String forecastJsonStr, boolean farenheit) throws JSONException {
 		JSONObject forecastJson = new JSONObject(forecastJsonStr);
@@ -41,5 +46,13 @@ public class WeatherLocation {
 
 	public void setDays(List<Day> days) {
 		this.days = days;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 }

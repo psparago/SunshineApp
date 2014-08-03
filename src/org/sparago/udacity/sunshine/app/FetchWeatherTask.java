@@ -6,24 +6,33 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.sparago.udacity.sunshine.app.data.WeatherContract;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
+import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 import org.sparago.udacity.sunshine.app.models.weather.Day;
 import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
 public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
-
 	private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 	private Context context;
 	private ArrayAdapter<String> forecastAdapter;
 	private WeatherLocationObserver locationObserver;
 
-	public FetchWeatherTask(Context context, WeatherLocationObserver locationObserver, ArrayAdapter<String> forecastAdapter) {
+	public FetchWeatherTask(Context context,
+			WeatherLocationObserver locationObserver,
+			ArrayAdapter<String> forecastAdapter) {
 		this.context = context;
 		this.forecastAdapter = forecastAdapter;
 		this.locationObserver = locationObserver;
@@ -39,12 +48,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 		final String unitsValue = "metric";
 		final String daysParam = "cnt";
 		final int daysValue = 14;
-		
+
 		if (params.length == 0) {
 			return null;
 		}
-		String locationQuery = params[0];
-		
+		String locationSetting = params[0];
+
 		WeatherLocation location = null;
 		boolean farenheit = Utility.isFarenheit(context);
 
@@ -60,7 +69,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 			URL url = new URL(Uri
 					.parse(baseUrl)
 					.buildUpon()
-					.appendQueryParameter(queryParam, locationQuery)
+					.appendQueryParameter(queryParam, locationSetting)
 					.appendQueryParameter(modeParam, modeValue)
 					.appendQueryParameter(unitsParam, unitsValue)
 					.appendQueryParameter(daysParam,
@@ -93,9 +102,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 
 			if (buffer.length() > 0) {
 				forecastJsonStr = buffer.toString();
-				location = new WeatherLocation();
+				location = new WeatherLocation(locationSetting);
 				location.parseJson(forecastJsonStr, farenheit);
 			}
+
+			long locationId = addLocation(location);
+			addDays(location, locationId);
 
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Error getting weather JSON", e);
@@ -126,4 +138,77 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 		}
 	}
 
+	private long addLocation(WeatherLocation location) {
+		Log.v(LOG_TAG, "adding location: " + location.getLocation());
+		long locationRowId = 0;
+		Cursor cursor = null;
+		try {
+			cursor = context.getContentResolver().query(
+					LocationEntry.CONTENT_URI,
+					new String[] { LocationEntry._ID },
+					LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
+					new String[] { location.getLocation() }, null // sort order
+					);
+			if (cursor.moveToFirst()) {
+				locationRowId = cursor.getInt(0);
+				Log.v(LOG_TAG, "found location: " + location.getLocation()
+						+ " in database, id " + locationRowId);
+			} else {
+				ContentValues locationValues = new ContentValues();
+				locationValues.put(LocationEntry.COLUMN_LOCATION_SETTING,
+						location.getLocation());
+				locationValues.put(LocationEntry.COLUMN_CITY_NAME, location
+						.getCity().getName());
+				locationValues.put(LocationEntry.COLUMN_COORD_LAT, location
+						.getCity().getCoord().getLatitude());
+				locationValues.put(LocationEntry.COLUMN_COORD_LONG, location
+						.getCity().getCoord().getLongitude());
+
+				Uri locationInsertUri = context.getContentResolver().insert(
+						LocationEntry.CONTENT_URI, locationValues);
+				locationRowId = ContentUris.parseId(locationInsertUri);
+				Log.v(LOG_TAG, "inserted location: " + location.getLocation()
+						+ " in database, id " + locationRowId);
+			}
+			return locationRowId;
+		} finally {
+			if (cursor != null)
+				cursor.close();
+		}
+	}
+
+	private void addDays(WeatherLocation location, long locationId) {
+		Log.v(LOG_TAG, "adding weather days for location " + location.getLocation());
+		
+		int rowsDeleted = context.getContentResolver().delete(
+				WeatherContract.WeatherEntry.CONTENT_URI,
+				WeatherContract.WeatherEntry.COLUMN_LOC_KEY + " = ?",
+				new String[] { Long.toString(locationId) });
+		Log.v(LOG_TAG, "deleted " + rowsDeleted + " weather days for location " + location.getLocation());
+		
+		List<ContentValues> cvs = new ArrayList<ContentValues>();
+		List<Day> days = location.getDays();
+		for (Day day : days) {
+			ContentValues weatherValues = new ContentValues();
+			weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationId);
+			weatherValues.put(WeatherEntry.COLUMN_DATETEXT,
+					WeatherContract.getDbDateString(day.getDate()));
+			weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, day.getHumidity());
+			weatherValues.put(WeatherEntry.COLUMN_PRESSURE, day.getPressure());
+			weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, day.getSpeed());
+			weatherValues.put(WeatherEntry.COLUMN_DEGREES, day.getSpeed());
+			weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, day.getTemps()
+					.getHigh());
+			weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, day.getTemps()
+					.getLow());
+			weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, day.getWeather()
+					.getDescription());
+			weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, day.getWeather()
+					.getId());
+			cvs.add(weatherValues);
+		}
+		context.getContentResolver().bulkInsert(
+				WeatherContract.WeatherEntry.CONTENT_URI,
+				cvs.toArray(new ContentValues[cvs.size()]));
+	}
 }

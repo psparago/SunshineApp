@@ -1,5 +1,8 @@
 package org.sparago.udacity.sunshine.app.data;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -135,5 +138,11 @@ public class WeatherContract {
 	    public static String getStartDateFromUri(Uri uri) {
 	    	return uri.getQueryParameter(COLUMN_DATETEXT);
 	    }
+	}
+	
+	public static final String DATE_FORMAT = "yyyyMMdd";
+	public static String getDbDateString(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+		return sdf.format(date);
 	}
 }
