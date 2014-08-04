@@ -22,19 +22,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 	private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 	private Context context;
-	private ArrayAdapter<String> forecastAdapter;
 	private WeatherLocationObserver locationObserver;
 
 	public FetchWeatherTask(Context context,
-			WeatherLocationObserver locationObserver,
-			ArrayAdapter<String> forecastAdapter) {
+			WeatherLocationObserver locationObserver) {
 		this.context = context;
-		this.forecastAdapter = forecastAdapter;
 		this.locationObserver = locationObserver;
 	}
 
@@ -130,12 +126,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 	@Override
 	protected void onPostExecute(WeatherLocation weatherLocation) {
 		locationObserver.onWeatherLocationChanged(weatherLocation);
-		if (weatherLocation != null) {
-			forecastAdapter.clear();
-			for (Day d : weatherLocation.getDays()) {
-				forecastAdapter.add(d.toString());
-			}
-		}
 	}
 
 	private long addLocation(WeatherLocation location) {

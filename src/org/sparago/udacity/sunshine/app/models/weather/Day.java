@@ -97,20 +97,4 @@ public class Day {
 	public void setRain(double rain) {
 		this.rain = rain;
 	}
-
-	/*
-	 * The date/time conversion code is going to be moved outside the asynctask
-	 * later, so for convenience we're breaking it out into its own method now.
-	 */
-	public String getReadableDateString() {
-		SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
-		return format.format(date).toString();
-	}
-
-
-	public String toString() {
-		return getReadableDateString() + " - " + weather.getDescription() + " - "
-				+ temps.getHighAndLow();
-		
-	}
 }

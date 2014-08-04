@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,7 +51,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 	private static final int COL_WEATHER_MIN_TEMP = 4;
 	private static final int COL_LOCATION_SETTING = 5;
 	
-	protected ArrayAdapter<String> forecastAdapter = null;
+	protected SimpleCursorAdapter forecastAdapter = null;
 	private String mLocation;
 	private WeatherLocation currentLocation;
 
@@ -74,9 +75,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 			Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_main,
 				container, false);
-		forecastAdapter = new ArrayAdapter<String>(getActivity(),
-				R.layout.list_item_forecast, R.id.list_item_forecast_textview,
-				new ArrayList<String>());
+		forecastAdapter = new SimpleCursorAdapter(
+				getActivity(),
+				R.layout.list_item_forecast,
+				null,
+				new String[] {
+					WeatherEntry.COLUMN_DATETEXT,
+					WeatherEntry.COLUMN_SHORT_DESC,
+					WeatherEntry.COLUMN_MAX_TEMP,
+					WeatherEntry.COLUMN_MIN_TEMP,
+				},
+				new int[] {
+					R.id.list_item_date_textview,
+					R.id.list_item_forecast_textview,
+					R.id.list_item_high_textview,
+					R.id.list_item_low_textview
+				},
+				0
+		);
 		ListView listView = (ListView) rootView
 				.findViewById(R.id.listview_forecast);
 		listView.setAdapter(forecastAdapter);
@@ -85,10 +101,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				String forecast = forecastAdapter.getItem(position);
-				Intent intent = new Intent(getActivity(), DetailActivity.class);
-				intent.putExtra(Intent.EXTRA_TEXT, forecast);
-				startActivity(intent);
+				//String forecast = forecastAdapter.getItem(position);
+				//Intent intent = new Intent(getActivity(), DetailActivity.class);
+				//intent.putExtra(Intent.EXTRA_TEXT, forecast);
+				//startActivity(intent);
 			}
 		});
 		return rootView;
@@ -145,7 +161,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 			public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
 				currentLocation = weatherLocation;
 			}
-		}, forecastAdapter).execute(mLocation);
+		}).execute(mLocation);
 	}
 
     // This is called when a new Loader needs to be created.  This
@@ -177,14 +193,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         );
     }
 	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
-		// TODO Auto-generated method stub
-		
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		forecastAdapter.swapCursor(cursor);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
-		// TODO Auto-generated method stub
-		
+		forecastAdapter.swapCursor(null);
 	}
 }

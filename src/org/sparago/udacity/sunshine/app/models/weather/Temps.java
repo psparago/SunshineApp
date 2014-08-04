@@ -18,10 +18,10 @@ public class Temps {
 	}
 	
 	public void parseJson(JSONObject temperatureObject, boolean farenheit) throws JSONException {
-		this.high = adjustTemperatureUnits(
-				temperatureObject.getDouble(OWM_MAX), farenheit);
-		this.low = adjustTemperatureUnits(
-				temperatureObject.getDouble(OWM_MIN), farenheit);
+		this.high = Math.round(adjustTemperatureUnits(
+				temperatureObject.getDouble(OWM_MAX), farenheit));
+		this.low = Math.round(adjustTemperatureUnits(
+				temperatureObject.getDouble(OWM_MIN), farenheit));
 	}
 	
 	public double getDay() {
@@ -59,23 +59,6 @@ public class Temps {
 	}
 	public void setMorn(double morn) {
 		this.morn = morn;
-	}
-	
-	public String getHighAndLow() {
-		return formatHighLows(high, low);
-	}
-	
-	/**
-	 * Prepare the weather high/lows for presentation.
-	 */
-	private String formatHighLows(double high, double low) {
-		// For presentation, assume the user doesn't care about tenths of a
-		// degree.
-		long roundedHigh = Math.round(high);
-		long roundedLow = Math.round(low);
-
-		String highLowStr = roundedHigh + "/" + roundedLow;
-		return highLowStr;
 	}
 	
 	private double adjustTemperatureUnits(double temp, boolean farenheit) {
