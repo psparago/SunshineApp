@@ -117,19 +117,8 @@ public class ForecastFragment extends Fragment implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
-				boolean farenheit = Utility.isFarenheit(getActivity());
-				String forecast = String.format("%s - %s - %s/%s", 
-						Utility.formatDate(c.getString(COL_WEATHER_DATE)),
-						c.getString(COL_WEATHER_DESC),
-						Utility.formatTemperature(
-								c.getDouble(COL_WEATHER_MAX_TEMP),
-								farenheit),
-						Utility.formatTemperature(
-								c.getDouble(COL_WEATHER_MIN_TEMP),
-								farenheit)
-						);
 				Intent intent = new Intent(getActivity(), DetailActivity.class);
-				intent.putExtra(Intent.EXTRA_TEXT, forecast);
+				intent.putExtra(Intent.EXTRA_TEXT, c.getString(COL_WEATHER_DATE));
 				startActivity(intent);
 			}
 		});
@@ -178,7 +167,8 @@ public class ForecastFragment extends Fragment implements
 	public void onStart() {
 		super.onStart();
 	}
-	
+
+	@Override
 	public void onResume() {
 		super.onResume();
 		if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
