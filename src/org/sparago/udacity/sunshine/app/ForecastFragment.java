@@ -67,7 +67,7 @@ public class ForecastFragment extends Fragment implements
 		super.onActivityCreated(savedInstanceState);
 		getLoaderManager().initLoader(FORECAST_LOADER, null, this);
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class ForecastFragment extends Fragment implements
 				case COL_WEATHER_MIN_TEMP: {
 					// we have to do some formatting and possibly a conversion
 					((TextView) view).setText(Utility.formatTemperature(
-							cursor.getDouble(columnIndex), isFarenheit));
+							cursor.getDouble(columnIndex), isFarenheit) + "\u00B0");
 					return true;
 				}
 				case COL_WEATHER_DATE: {
@@ -118,7 +118,7 @@ public class ForecastFragment extends Fragment implements
 					int position, long id) {
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
 				Intent intent = new Intent(getActivity(), DetailActivity.class);
-				intent.putExtra(Intent.EXTRA_TEXT, c.getString(COL_WEATHER_DATE));
+				intent.putExtra(DetailActivity.DATE_KEY, c.getString(COL_WEATHER_DATE));
 				startActivity(intent);
 			}
 		});
