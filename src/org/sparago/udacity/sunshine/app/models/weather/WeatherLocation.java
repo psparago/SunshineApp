@@ -18,7 +18,7 @@ public class WeatherLocation {
 		this.setLocation(location);
 	}
 	
-	public void parseJson(String forecastJsonStr, boolean farenheit) throws JSONException {
+	public void parseJson(String forecastJsonStr) throws JSONException {
 		JSONObject forecastJson = new JSONObject(forecastJsonStr);
 		city = new City();
 		city.parseJson(forecastJson.getJSONObject(OWM_CITY));
@@ -27,7 +27,7 @@ public class WeatherLocation {
 		for (int i = 0; i < weatherArray.length(); i++) {
 			JSONObject dayForecast = weatherArray.getJSONObject(i);
 			Day day = new Day();
-			day.parseJson(dayForecast, farenheit);
+			day.parseJson(dayForecast);
 			days.add(day);
 		}
 	}

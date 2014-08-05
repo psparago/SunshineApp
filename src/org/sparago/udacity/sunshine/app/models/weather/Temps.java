@@ -17,11 +17,9 @@ public class Temps {
 	public Temps() {
 	}
 	
-	public void parseJson(JSONObject temperatureObject, boolean farenheit) throws JSONException {
-		this.high = Math.round(adjustTemperatureUnits(
-				temperatureObject.getDouble(OWM_MAX), farenheit));
-		this.low = Math.round(adjustTemperatureUnits(
-				temperatureObject.getDouble(OWM_MIN), farenheit));
+	public void parseJson(JSONObject temperatureObject) throws JSONException {
+		this.high = temperatureObject.getDouble(OWM_MAX);
+		this.low = temperatureObject.getDouble(OWM_MIN);
 	}
 	
 	public double getDay() {

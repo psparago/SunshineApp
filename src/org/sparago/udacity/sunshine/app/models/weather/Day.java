@@ -20,13 +20,13 @@ public class Day {
 	private double deg;
 	private double rain;
 	
-	public void parseJson(JSONObject dayForecast, boolean farenheit) throws JSONException {
+	public void parseJson(JSONObject dayForecast) throws JSONException {
 		// convert from Unix time stamp to Java Date
 		date = new Date(dayForecast.getLong(OWM_DATETIME) * 1000);
 
 		JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
 		temps = new Temps();
-		temps.parseJson(temperatureObject, farenheit);
+		temps.parseJson(temperatureObject);
 
 		JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER)
 				.getJSONObject(0);

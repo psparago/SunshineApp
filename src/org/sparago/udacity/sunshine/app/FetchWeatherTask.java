@@ -51,7 +51,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 		String locationSetting = params[0];
 
 		WeatherLocation location = null;
-		boolean farenheit = Utility.isFarenheit(context);
 
 		// These two need to be declared outside the try/catch
 		// so that they can be closed in the finally block.
@@ -99,7 +98,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 			if (buffer.length() > 0) {
 				forecastJsonStr = buffer.toString();
 				location = new WeatherLocation(locationSetting);
-				location.parseJson(forecastJsonStr, farenheit);
+				location.parseJson(forecastJsonStr);
 			}
 
 			long locationId = addLocation(location);
