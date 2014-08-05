@@ -140,7 +140,7 @@ public class WeatherContract {
 	    }
 	}
 	
-	public static final String DATE_FORMAT = "E, MMM d";
+	public static final String DATE_FORMAT = "yyyyMMdd";
 	public static String getDbDateString(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 		return sdf.format(date).toString();
