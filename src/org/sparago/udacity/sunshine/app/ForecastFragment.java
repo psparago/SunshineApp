@@ -1,6 +1,5 @@
 package org.sparago.udacity.sunshine.app;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -27,13 +26,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ForecastFragment extends Fragment implements
-		LoaderManager.LoaderCallbacks<Cursor> {
+		LoaderManager.LoaderCallbacks<Cursor>, WeatherLocationObserver {
 	private static final int FORECAST_LOADER = 0;
 
 	// Subset of columns used for the forecast view.
@@ -179,17 +177,18 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public void onStart() {
 		super.onStart();
-		updateWeather();
+	}
+	
+	public void onResume() {
+		super.onResume();
+		if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
+			getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+		}
 	}
 
 	private void updateWeather() {
 		mLocation = Utility.getPreferredLocation(getActivity());
-		new FetchWeatherTask(getActivity(), new WeatherLocationObserver() {
-			@Override
-			public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
-				currentLocation = weatherLocation;
-			}
-		}).execute(mLocation);
+		new FetchWeatherTask(getActivity()).execute(mLocation);
 	}
 
 	// This is called when a new Loader needs to be created. This
@@ -225,5 +224,11 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		forecastAdapter.swapCursor(null);
+	}
+
+	@Override
+	public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
+		this.currentLocation = weatherLocation;
+		this.mLocation = weatherLocation.getLocation();
 	}
 }

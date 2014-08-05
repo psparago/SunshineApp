@@ -1,14 +1,13 @@
 package org.sparago.udacity.sunshine.app;
  
 import org.sparago.udacity.sunshine.app.R;
+import org.sparago.udacity.sunshine.app.data.WeatherContract;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
  
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -20,6 +19,8 @@ import android.view.KeyEvent;
  */
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
+	
+	private boolean mBindingPreference;
  
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity
      * is changed.)
      */
     private void bindPreferenceSummaryToValue(Preference preference) {
+    	mBindingPreference = true;
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);
  
@@ -48,12 +50,21 @@ public class SettingsActivity extends PreferenceActivity
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+        mBindingPreference = false;
     }
  
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
  
+        if (!mBindingPreference) {
+        	if (preference.getKey().equals(getString(R.string.pref_location_key))) {
+        		new FetchWeatherTask(this).execute(stringValue);	// value is location        	
+        	} else {
+        		getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+        	}
+        }
+        
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list (since they have separate labels/values).
