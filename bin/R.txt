@@ -280,7 +280,7 @@ int id list_item 0x7f060029
 int id list_item_date_textview 0x7f060043
 int id list_item_forecast_textview 0x7f060044
 int id list_item_high_textview 0x7f060045
-int id list_item_icon_imageview 0x7f060042
+int id list_item_icon 0x7f060042
 int id list_item_low_textview 0x7f060046
 int id listview_forecast 0x7f060041
 int id middle 0x7f060012
@@ -366,6 +366,7 @@ int string action_settings 0x7f0b000e
 int string action_share 0x7f0b0011
 int string action_showOnMap 0x7f0b0010
 int string app_name 0x7f0b000d
+int string format_full_friendly_date 0x7f0b001c
 int string pref_location_default 0x7f0b0016
 int string pref_location_key 0x7f0b0015
 int string pref_location_label 0x7f0b0014
@@ -374,6 +375,8 @@ int string pref_temp_units_key 0x7f0b0018
 int string pref_temp_units_label 0x7f0b0017
 int string title_activity_detail 0x7f0b0012
 int string title_activity_settings 0x7f0b0013
+int string today 0x7f0b001a
+int string tomorrow 0x7f0b001b
 int style AppBaseTheme 0x7f0c008b
 int style AppTheme 0x7f0c008c
 int style TextAppearance_AppCompat_Base_CompactMenu_Dialog 0x7f0c0063

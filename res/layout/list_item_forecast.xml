@@ -9,7 +9,7 @@
     >
 
     <ImageView
-        android:id="@+id/list_item_icon_imageview"
+        android:id="@+id/list_item_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_launcher" 
@@ -27,13 +27,11 @@
 	        android:id="@+id/list_item_date_textview"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Tomorrow"
 	        />
 	    <TextView
 	        android:id="@+id/list_item_forecast_textview"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Sunny"
 	        />
 	</LinearLayout>
     
@@ -46,13 +44,11 @@
 	        android:id="@+id/list_item_high_textview"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="80"
 	        />
 	    <TextView
 	        android:id="@+id/list_item_low_textview"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="72"
 	        />
 	</LinearLayout>
 	
