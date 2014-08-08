@@ -65,14 +65,15 @@ public class ForecastFragment extends Fragment implements
 		super.onActivityCreated(savedInstanceState);
 		getLoaderManager().initLoader(FORECAST_LOADER, null, this);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_main,
 				container, false);
-		
-		forecastAdapter = new ForecastCursorAdapter(getActivity(), null, true);
+
+		forecastAdapter = new ForecastCursorAdapter(getActivity(), null,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
 		ListView listView = (ListView) rootView
 				.findViewById(R.id.listview_forecast);
@@ -84,7 +85,8 @@ public class ForecastFragment extends Fragment implements
 					int position, long id) {
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
 				Intent intent = new Intent(getActivity(), DetailActivity.class);
-				intent.putExtra(DetailActivity.DATE_KEY, c.getString(COL_WEATHER_DATE));
+				intent.putExtra(DetailActivity.DATE_KEY,
+						c.getString(COL_WEATHER_DATE));
 				startActivity(intent);
 			}
 		});
@@ -137,7 +139,9 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
+		if (mLocation != null
+				&& !mLocation.equals(Utility
+						.getPreferredLocation(getActivity()))) {
 			getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
 		}
 	}
