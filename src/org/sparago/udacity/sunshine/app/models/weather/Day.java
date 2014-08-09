@@ -10,6 +10,10 @@ public class Day {
 	private static final String OWM_WEATHER = "weather";
 	private static final String OWM_TEMPERATURE = "temp";
 	private static final String OWM_DATETIME = "dt";
+	private static final String OWM_PRESSURE = "pressure";
+	private static final String OWM_HUMIDITY = "humidity";
+	private static final String OWM_SPEED = "speed";
+	private static final String OWM_DEGREES = "deg";
 	
 	private Date date;
 	private Temps temps;
@@ -17,7 +21,7 @@ public class Day {
 	private double pressure;
 	private double humidity;
 	private double speed;
-	private double deg;
+	private double degrees;
 	private double rain;
 	
 	public void parseJson(JSONObject dayForecast) throws JSONException {
@@ -32,6 +36,11 @@ public class Day {
 				.getJSONObject(0);
 		weather = new Weather();
 		weather.parseJson(weatherObject);
+
+		this.pressure = dayForecast.getDouble(OWM_PRESSURE);
+		this.humidity = dayForecast.getDouble(OWM_HUMIDITY);
+		this.speed = dayForecast.getDouble(OWM_SPEED);
+		this.degrees = dayForecast.getDouble(OWM_DEGREES);
 	}
 
 	public Date getDate() {
@@ -82,12 +91,12 @@ public class Day {
 		this.speed = speed;
 	}
 
-	public double getDeg() {
-		return deg;
+	public double getDegrees() {
+		return degrees;
 	}
 
-	public void setDeg(double deg) {
-		this.deg = deg;
+	public void setDegrees(double degrees) {
+		this.degrees = degrees;
 	}
 
 	public double getRain() {

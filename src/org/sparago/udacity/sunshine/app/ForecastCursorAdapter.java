@@ -37,49 +37,39 @@ public class ForecastCursorAdapter extends CursorAdapter {
 		int viewType = getItemViewType(cursor.getPosition());
 		int layoutId = viewType == VIEW_TYPE_TODAY ? R.layout.list_item_forecast_today
 				: R.layout.list_item_forecast;
-		return LayoutInflater.from(context).inflate(layoutId, parent, false);
+		View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+		view.setTag(new ForecastViewHolder(view));
+		return view;
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-
+		ForecastViewHolder viewHolder = (ForecastViewHolder)view.getTag();
+		
 		// Read weather icon ID from cursor
 		int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
 
 		// Use placeholder image for now
-		ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-		iconView.setImageResource(R.drawable.ic_launcher);
+		viewHolder.iconView.setImageResource(R.drawable.ic_launcher);
 
 		// Read date from cursor
 		String dateString = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
-		// Find TextView and set formatted date on it
-		TextView dateView = (TextView) view
-				.findViewById(R.id.list_item_date_textview);
-		dateView.setText(Utility.getFriendlyDayString(context, dateString));
+		viewHolder.dateView.setText(Utility.getFriendlyDayString(context, dateString));
 
 		// Read weather forecast from cursor
 		String description = cursor
 				.getString(ForecastFragment.COL_WEATHER_DESC);
-		// Find TextView and set weather forecast on it
-		TextView descriptionView = (TextView) view
-				.findViewById(R.id.list_item_forecast_textview);
-		descriptionView.setText(description);
+		viewHolder.descriptionView.setText(description);
 
 		// Read user preference for metric or imperial temperature units
 		boolean isFarenheit = Utility.isFarenheit(context);
 
 		// Read high temperature from cursor
 		float high = cursor.getFloat(ForecastFragment.COL_WEATHER_MAX_TEMP);
-		TextView hiTempView = (TextView) view
-				.findViewById(R.id.list_item_high_textview);
-		hiTempView.setText(Utility.formatTemperature(high, isFarenheit)
-				+ "\u00B0");
+		viewHolder.hiTempView.setText(Utility.formatTemperature(context, high, isFarenheit));
 
 		// Read low temperature from cursor
 		float low = cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP);
-		TextView lowTempView = (TextView) view
-				.findViewById(R.id.list_item_low_textview);
-		lowTempView.setText(Utility.formatTemperature(low, isFarenheit)
-				+ "\u00B0");
+		viewHolder.lowTempView.setText(Utility.formatTemperature(context, low, isFarenheit));
 	}
 }

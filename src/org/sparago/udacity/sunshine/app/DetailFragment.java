@@ -5,6 +5,7 @@ import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,7 +23,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 public class DetailFragment extends Fragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -57,6 +57,12 @@ public class DetailFragment extends Fragment implements
 
 	private String date;
 	private ShareActionProvider shareActionProvider;
+	
+	// Save the root view so we can get the View Holder in its tag.
+	// NOTE: Can't get the View returned from onCreateView using getView() because 
+	// 		 the compatibility version of Fragment inserts a NoSaveStateFrameLayout as 
+	// 		 the getView() view.
+	private View rootView;	 
 
 	public DetailFragment() {
 		this.setHasOptionsMenu(true);
@@ -76,9 +82,9 @@ public class DetailFragment extends Fragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_detail, container,
+		rootView = inflater.inflate(R.layout.fragment_detail, container,
 				false);
-
+		rootView.setTag(new DetailViewHolder(rootView));
 		return rootView;
 	}
 
@@ -159,23 +165,36 @@ public class DetailFragment extends Fragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		Context context = getActivity();
 		clearWidgets();
+		DetailViewHolder viewHolder = getDetailViewHolder();
 		if (cursor.moveToFirst()) {
+			// Use placeholder image for now
+			viewHolder.iconView.setImageResource(R.drawable.ic_launcher);
+
+			viewHolder.dateView.setText(Utility.formatDate(cursor
+					.getString(COL_WEATHER_DATE)));
+
+			viewHolder.forecastView.setText(cursor.getString(COL_WEATHER_DESC));
+
 			boolean farenheit = Utility.isFarenheit(getActivity());
-			((TextView) this.getView().findViewById(R.id.detail_date_textview))
-					.setText(Utility.formatDate(cursor
-							.getString(COL_WEATHER_DATE)));
-			((TextView) this.getView().findViewById(
-					R.id.detail_forecast_textview)).setText(cursor
-					.getString(COL_WEATHER_DESC));
-			((TextView) this.getView().findViewById(R.id.detail_high_textview))
-					.setText(Utility.formatTemperature(
-							cursor.getDouble(COL_WEATHER_MAX_TEMP), farenheit)
-							+ "\u00B0");
-			((TextView) this.getView().findViewById(R.id.detail_low_textview))
-					.setText(Utility.formatTemperature(
-							cursor.getDouble(COL_WEATHER_MIN_TEMP), farenheit)
-							+ "\u00B0");
+			viewHolder.highView.setText(Utility.formatTemperature(
+					context, cursor.getDouble(COL_WEATHER_MAX_TEMP),
+					farenheit));
+			viewHolder.lowView.setText(Utility.formatTemperature(context,
+					cursor.getDouble(COL_WEATHER_MIN_TEMP), farenheit));
+
+			viewHolder.humidityView.setText(context.getString(
+					R.string.format_humidity,
+					cursor.getFloat(COL_WEATHER_HUMIDITY)));
+
+			viewHolder.windView.setText(Utility.getFormattedWind(context,
+					cursor.getFloat(COL_WEATHER_WIND_SPEED),
+					cursor.getFloat(COL_WEATHER_DEGREES)));
+
+			viewHolder.pressureView.setText(context.getString(
+					R.string.format_pressure,
+					cursor.getFloat(COL_WEATHER_PRESSURE)));
 		}
 	}
 
@@ -187,26 +206,25 @@ public class DetailFragment extends Fragment implements
 	}
 
 	private void clearWidgets() {
-		((TextView) this.getView().findViewById(R.id.detail_date_textview))
-				.setText("");
-		((TextView) this.getView().findViewById(R.id.detail_forecast_textview))
-				.setText("");
-		((TextView) this.getView().findViewById(R.id.detail_high_textview))
-				.setText("");
-		((TextView) this.getView().findViewById(R.id.detail_low_textview))
-				.setText("");
+		DetailViewHolder viewHolder = getDetailViewHolder();
+		viewHolder.dateView.setText("");
+		viewHolder.forecastView.setText("");
+		viewHolder.highView.setText("");
+		viewHolder.lowView.setText("");
+		viewHolder.humidityView.setText("");
+		viewHolder.windView.setText("");
+		viewHolder.pressureView.setText("");
 	}
 
 	private String getShareData() {
-		return String.format(
-				"%s - %s - %s / %s",
-				((TextView) this.getView().findViewById(
-						R.id.detail_date_textview)).getText(),
-				((TextView) this.getView().findViewById(
-						R.id.detail_forecast_textview)).getText(),
-				((TextView) this.getView().findViewById(
-						R.id.detail_high_textview)).getText(), ((TextView) this
-						.getView().findViewById(R.id.detail_low_textview))
-						.getText());
+		DetailViewHolder viewHolder = getDetailViewHolder();
+		return String.format("%s - %s - %s / %s",
+				viewHolder.dateView.getText(),
+				viewHolder.forecastView.getText(),
+				viewHolder.highView.getText(), viewHolder.lowView.getText());
+	}
+
+	private DetailViewHolder getDetailViewHolder() {
+		return (DetailViewHolder) rootView.getTag();
 	}
 }
