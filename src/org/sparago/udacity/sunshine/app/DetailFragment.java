@@ -57,12 +57,13 @@ public class DetailFragment extends Fragment implements
 
 	private String date;
 	private ShareActionProvider shareActionProvider;
-	
+
 	// Save the root view so we can get the View Holder in its tag.
-	// NOTE: Can't get the View returned from onCreateView using getView() because 
-	// 		 the compatibility version of Fragment inserts a NoSaveStateFrameLayout as 
-	// 		 the getView() view.
-	private View rootView;	 
+	// NOTE: Can't get the View returned from onCreateView using getView()
+	// because
+	// the compatibility version of Fragment inserts a NoSaveStateFrameLayout as
+	// the getView() view.
+	private View rootView;
 
 	public DetailFragment() {
 		this.setHasOptionsMenu(true);
@@ -82,8 +83,7 @@ public class DetailFragment extends Fragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.fragment_detail, container,
-				false);
+		rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 		rootView.setTag(new DetailViewHolder(rootView));
 		return rootView;
 	}
@@ -169,18 +169,24 @@ public class DetailFragment extends Fragment implements
 		clearWidgets();
 		DetailViewHolder viewHolder = getDetailViewHolder();
 		if (cursor.moveToFirst()) {
+			
+			// weather condition ID
+			int weatherId = cursor.getInt(COL_WEATHER_WEATHER_ID);
+			
 			// Use placeholder image for now
 			viewHolder.iconView.setImageResource(R.drawable.ic_launcher);
 
-			viewHolder.dateView.setText(Utility.formatDate(cursor
-					.getString(COL_WEATHER_DATE)));
+			viewHolder.dayView.setText(Utility.getDayName(context,
+					cursor.getString(COL_WEATHER_DATE)));
+
+			viewHolder.dateView.setText(Utility.getFormattedMonthDay(context,
+					cursor.getString(COL_WEATHER_DATE)));
 
 			viewHolder.forecastView.setText(cursor.getString(COL_WEATHER_DESC));
 
 			boolean farenheit = Utility.isFarenheit(getActivity());
-			viewHolder.highView.setText(Utility.formatTemperature(
-					context, cursor.getDouble(COL_WEATHER_MAX_TEMP),
-					farenheit));
+			viewHolder.highView.setText(Utility.formatTemperature(context,
+					cursor.getDouble(COL_WEATHER_MAX_TEMP), farenheit));
 			viewHolder.lowView.setText(Utility.formatTemperature(context,
 					cursor.getDouble(COL_WEATHER_MIN_TEMP), farenheit));
 
