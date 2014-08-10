@@ -174,7 +174,7 @@ public class DetailFragment extends Fragment implements
 			int weatherId = cursor.getInt(COL_WEATHER_WEATHER_ID);
 			
 			// Use placeholder image for now
-			viewHolder.iconView.setImageResource(R.drawable.ic_launcher);
+			viewHolder.iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
 			viewHolder.dayView.setText(Utility.getDayName(context,
 					cursor.getString(COL_WEATHER_DATE)));

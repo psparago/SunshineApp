@@ -202,7 +202,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 			weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, day.getTemps()
 					.getLow());
 			weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, day.getWeather()
-					.getDescription());
+					.getMain());
 			weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, day.getWeather()
 					.getId());
 			cvs.add(weatherValues);
