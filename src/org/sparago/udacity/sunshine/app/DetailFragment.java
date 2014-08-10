@@ -1,5 +1,7 @@
 package org.sparago.udacity.sunshine.app;
 
+import java.util.Date;
+
 import org.sparago.udacity.sunshine.app.R;
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
@@ -60,9 +62,8 @@ public class DetailFragment extends Fragment implements
 
 	// Save the root view so we can get the View Holder in its tag.
 	// NOTE: Can't get the View returned from onCreateView using getView()
-	// because
-	// the compatibility version of Fragment inserts a NoSaveStateFrameLayout as
-	// the getView() view.
+	// because the compatibility version of Fragment inserts a 
+	// NoSaveStateFrameLayout as the getView() view.
 	private View rootView;
 
 	public DetailFragment() {
@@ -147,7 +148,15 @@ public class DetailFragment extends Fragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		Intent intent = getActivity().getIntent();
-		date = intent.getStringExtra(DetailActivity.DATE_KEY);
+		if (intent != null) {
+			date = intent.getStringExtra(DetailActivity.DATE_KEY);
+		}
+		
+		// If no date is provided with the intent, or there was no date, 
+		// default to today. 
+		if (date == null) {
+			date = WeatherContract.getDbDateString(new Date());
+		}
 
 		// Sort order: Ascending, by date.
 		String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
