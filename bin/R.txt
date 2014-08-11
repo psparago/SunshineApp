@@ -366,10 +366,11 @@ int layout abc_simple_decor 0x7f040017
 int layout activity_detail 0x7f040018
 int layout activity_main 0x7f040019
 int layout fragment_detail 0x7f04001a
-int layout fragment_main 0x7f04001b
-int layout list_item_forecast 0x7f04001c
-int layout list_item_forecast_today 0x7f04001d
-int layout support_simple_spinner_dropdown_item 0x7f04001e
+int layout fragment_detail_wide 0x7f04001b
+int layout fragment_main 0x7f04001c
+int layout list_item_forecast 0x7f04001d
+int layout list_item_forecast_today 0x7f04001e
+int layout support_simple_spinner_dropdown_item 0x7f04001f
 int menu detail 0x7f0f0000
 int menu detail_fragment 0x7f0f0001
 int menu forecast_fragment 0x7f0f0002
