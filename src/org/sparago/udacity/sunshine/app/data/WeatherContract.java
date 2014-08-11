@@ -68,6 +68,10 @@ public class WeatherContract {
 		public static Uri buildLocationUri(long id) {
 			return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+		
+		public static String getLocationConstraint() {
+			return COLUMN_LOCATION_SETTING + " = ?";
+		}
 }
 	
 	/* Inner class that defines the table contents of the weather table */

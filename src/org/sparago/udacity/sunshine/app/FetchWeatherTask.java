@@ -27,18 +27,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 	private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 	private Context context;
 	
-	private static final List<WeatherLocationObserver> observers = new ArrayList<WeatherLocationObserver>();
-	public static void addWeatherLocationObserver(WeatherLocationObserver observer) {
-		if (!observers.contains(observer)) {
-			observers.add(observer);
-		}
-	}
-	public static void removeWeatherLocationObserver(WeatherLocationObserver observer) {
-		if (observers.contains(observer)) {
-			observers.remove(observer);
-		}
-	}
-
 	public FetchWeatherTask(Context context) {
 		this.context = context;
 	}
@@ -133,9 +121,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 
 	@Override
 	protected void onPostExecute(WeatherLocation weatherLocation) {
-		for(WeatherLocationObserver observer : observers) {
-			observer.onWeatherLocationChanged(weatherLocation);
-		}
 	}
 
 	private long addLocation(WeatherLocation location) {

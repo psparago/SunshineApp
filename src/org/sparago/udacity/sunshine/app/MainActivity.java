@@ -6,11 +6,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements
+		ForecastFragment.ForecastItemSelectedListener {
 	private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 	private boolean mTwoPane;
@@ -24,8 +24,24 @@ public class MainActivity extends ActionBarActivity {
 
 		setContentView(R.layout.activity_main);
 
-		// The detail container vew will be present only in the large-screen
-		// layouts. If this view is present, then the activity should be 
+		// The forecast fragment will be present only in the large-screen
+		// (tablet) layouts. If the forecast fragment isn't there, 
+		// we will need to create the forecast fragment.
+		ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager()
+				.findFragmentById(R.id.fragment_forecast);
+		if (forecastFragment == null) {
+			if (savedInstanceState == null) {
+				forecastFragment = new ForecastFragment();
+				getSupportFragmentManager().beginTransaction()
+						.add(R.id.container, forecastFragment).commit();
+			}
+		}
+		// Set this activity as the forecast item selected listener on the
+		// forecast fragment
+		forecastFragment.setForecastListener(this);
+
+		// The detail container view will be present only in the large-screen
+		// layouts. If this view is present, then the activity should be
 		// in two-pane mode.
 		if (findViewById(R.id.weather_detail_container) != null) {
 			mTwoPane = true;
@@ -33,15 +49,30 @@ public class MainActivity extends ActionBarActivity {
 			// adding or replacing the detail fragment using a fragment
 			// transaction.
 			if (savedInstanceState == null) {
-				getSupportFragmentManager()
-						.beginTransaction()
-						.replace(R.id.weather_detail_container,
-								new DetailFragment()).commit();
+				getSupportFragmentManager().beginTransaction()
+						.replace(R.id.weather_detail_container, new DetailFragment())
+						.commit();
 			}
 		} else {
 			mTwoPane = false;
 		}
-		Log.d(LOG_TAG, "***********onCreate");
+	}
+
+	@Override
+	public void onForecastItemSelected(String date) {
+		if (mTwoPane) {
+			Bundle args = new Bundle();
+			args.putString(DetailFragment.DATE_ARGUMENT, date);
+			DetailFragment detailFragment = new DetailFragment();
+			detailFragment.setArguments(args);
+			getSupportFragmentManager().beginTransaction()
+				.replace(R.id.weather_detail_container, detailFragment)
+				.commit();
+		} else {
+			Intent intent = new Intent(this, DetailActivity.class)
+				.putExtra(DetailActivity.DATE_KEY, date);
+			startActivity(intent);
+		}
 	}
 
 	@Override
@@ -64,33 +95,4 @@ public class MainActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		Log.d(LOG_TAG, "***********onPause");
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		Log.d(LOG_TAG, "***********onResume");
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		Log.d(LOG_TAG, "***********onStart");
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		Log.d(LOG_TAG, "***********onStop");
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.d(LOG_TAG, "***********onDestroy");
-	}
 }

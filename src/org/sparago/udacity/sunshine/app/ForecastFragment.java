@@ -29,16 +29,21 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class ForecastFragment extends Fragment implements
-		LoaderManager.LoaderCallbacks<Cursor>, WeatherLocationObserver {
+		LoaderManager.LoaderCallbacks<Cursor> {
 	private static final int FORECAST_LOADER = 0;
+	private static final int LOCATION_LOADER = 1;
+
+	// Callback interface to notify when a forecast item is selected.
+	public interface ForecastItemSelectedListener {
+		public void onForecastItemSelected(String date);
+	}
 
 	// Subset of columns used for the forecast view.
 	private static final String[] FORECAST_COLUMNS = {
 			WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
 			WeatherEntry.COLUMN_DATETEXT, WeatherEntry.COLUMN_SHORT_DESC,
 			WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP,
-			WeatherEntry.COLUMN_WEATHER_ID,
-			LocationEntry.COLUMN_LOCATION_SETTING };
+			WeatherEntry.COLUMN_WEATHER_ID };
 
 	// Indexes of columns above (FORECAST_COLUMNS). Must sync.
 	public static final int COL_WEATHER_ID = 0;
@@ -47,13 +52,25 @@ public class ForecastFragment extends Fragment implements
 	public static final int COL_WEATHER_MAX_TEMP = 3;
 	public static final int COL_WEATHER_MIN_TEMP = 4;
 	public static final int COL_WEATHER_WEATHER_ID = 5;
-	public static final int COL_LOCATION_SETTING = 6;
 
-	protected ForecastCursorAdapter forecastAdapter = null;
+	private static final String[] LOCATION_COLUMNS = {
+			LocationEntry.COLUMN_COORD_LAT, LocationEntry.COLUMN_COORD_LONG };
+
+	// Indexes of columns above (LOCATION_COLUMNS). Must sync.
+	public static final int COL_LOCATION_COORD_LAT = 0;
+	public static final int COL_LOCATION_COORD_LONG = 1;
+
+	private ForecastCursorAdapter forecastAdapter = null;
+	private ForecastItemSelectedListener forecastItemSelectedListener;
 	private String mLocation;
-	private WeatherLocation currentLocation;
+	private float currentLongitude;
+	private float currentLatitude;
 
 	public ForecastFragment() {
+	}
+
+	public void setForecastListener(ForecastItemSelectedListener listener) {
+		forecastItemSelectedListener = listener;
 	}
 
 	@Override
@@ -66,6 +83,7 @@ public class ForecastFragment extends Fragment implements
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+		getLoaderManager().initLoader(LOCATION_LOADER, null, this);
 	}
 
 	@Override
@@ -86,10 +104,11 @@ public class ForecastFragment extends Fragment implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
-				Intent intent = new Intent(getActivity(), DetailActivity.class);
-				intent.putExtra(DetailActivity.DATE_KEY,
-						c.getString(COL_WEATHER_DATE));
-				startActivity(intent);
+				if (c.moveToPosition(position)
+						&& forecastItemSelectedListener != null) {
+					forecastItemSelectedListener.onForecastItemSelected(c
+							.getString(COL_WEATHER_DATE));
+				}
 			}
 		});
 		return rootView;
@@ -114,21 +133,18 @@ public class ForecastFragment extends Fragment implements
 	}
 
 	private void showLocationOnMap() {
-		if (currentLocation != null) {
+		if (mLocation != null) {
 			String uri = String.format(Locale.ENGLISH, "geo:%f,%f(%s)",
-					currentLocation.getCity().getCoord().getLatitude(),
-					currentLocation.getCity().getCoord().getLongitude(),
-					currentLocation.getCity().getName());
+					currentLatitude, currentLongitude, mLocation);
 			Uri geoLocation = Uri.parse(uri);
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(geoLocation);
 			if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
 				startActivity(intent);
 			} else {
-				Toast.makeText(
-						getActivity(),
-						"Cannot show: " + currentLocation.getCity().getName()
-								+ " on the map", Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(),
+						"Cannot show: " + mLocation + " on the map",
+						Toast.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -158,39 +174,49 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-		// To only show current and future dates, get the String representation
-		// for today,
-		// and filter the query to return weather only for dates after or
-		// including today.
-		// Only return data after today.
-		String startDate = WeatherContract.getDbDateString(new Date());
+		if (id == FORECAST_LOADER) {
+			// To only show current and future dates, get the String
+			// representation
+			// for today,
+			// and filter the query to return weather only for dates after or
+			// including today.
+			// Only return data after today.
+			String startDate = WeatherContract.getDbDateString(new Date());
 
-		// Sort order: Ascending, by date.
-		String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
+			// Sort order: Ascending, by date.
+			String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
-		mLocation = Utility.getPreferredLocation(getActivity());
-		Uri weatherForLocationUri = WeatherEntry
-				.buildWeatherLocationWithStartDate(mLocation, startDate);
+			mLocation = Utility.getPreferredLocation(getActivity());
+			Uri weatherForLocationUri = WeatherEntry
+					.buildWeatherLocationWithStartDate(mLocation, startDate);
 
-		// Now create and return a CursorLoader that will take care of
-		// creating a Cursor for the data being displayed.
-		return new CursorLoader(getActivity(), weatherForLocationUri,
-				FORECAST_COLUMNS, null, null, sortOrder);
+			// Now create and return a CursorLoader that will take care of
+			// creating a Cursor for the data being displayed.
+			return new CursorLoader(getActivity(), weatherForLocationUri,
+					FORECAST_COLUMNS, null, null, sortOrder);
+		} else {
+			Uri locationUri = LocationEntry.CONTENT_URI;
+			return new CursorLoader(getActivity(), locationUri,
+					LOCATION_COLUMNS, LocationEntry.getLocationConstraint(), 
+					new String[] { mLocation }, null);
+		}
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-		forecastAdapter.swapCursor(cursor);
+		if (loader.getId() == FORECAST_LOADER) {
+			forecastAdapter.swapCursor(cursor);
+		} else {
+			cursor.moveToFirst();
+			currentLongitude = cursor.getFloat(COL_LOCATION_COORD_LONG);
+			currentLatitude = cursor.getFloat(COL_LOCATION_COORD_LAT);
+		}
 	}
 
 	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		forecastAdapter.swapCursor(null);
-	}
-
-	@Override
-	public void onWeatherLocationChanged(WeatherLocation weatherLocation) {
-		this.currentLocation = weatherLocation;
-		this.mLocation = weatherLocation.getLocation();
+	public void onLoaderReset(Loader<Cursor> loader) {
+		if (loader.getId() == FORECAST_LOADER) {
+			forecastAdapter.swapCursor(null);
+		}
 	}
 }

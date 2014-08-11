@@ -17,11 +17,19 @@ public class DetailActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_detail);
 		if (savedInstanceState == null) {
+			String date = getIntent().getStringExtra(DATE_KEY);
+
+			Bundle arguments = new Bundle();
+			arguments.putString(DetailFragment.DATE_ARGUMENT, date);
+			
+			DetailFragment detailFragment = new DetailFragment();
+			detailFragment.setArguments(arguments);
+			
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.weather_detail_container, new DetailFragment()).commit();
+					.add(R.id.weather_detail_container, detailFragment).commit();
 		}
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

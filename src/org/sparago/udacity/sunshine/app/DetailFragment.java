@@ -32,6 +32,8 @@ public class DetailFragment extends Fragment implements
 	private static final String FORECAST_SHARE_HASHTAG = "#SunshineApp";
 	private static final int DETAIL_LOADER = 0;
 
+	public static final String DATE_ARGUMENT = "dateArg";
+
 	// Subset of columns used for the forecast view.
 	private static final String[] FORECAST_COLUMNS = {
 			WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -56,13 +58,11 @@ public class DetailFragment extends Fragment implements
 	private static final int COL_LOCATION_SETTING = 10;
 
 	private String mLocation;
-
-	private String date;
 	private ShareActionProvider shareActionProvider;
 
 	// Save the root view so we can get the View Holder in its tag.
 	// NOTE: Can't get the View returned from onCreateView using getView()
-	// because the compatibility version of Fragment inserts a 
+	// because the compatibility version of Fragment inserts a
 	// NoSaveStateFrameLayout as the getView() view.
 	private View rootView;
 
@@ -78,6 +78,8 @@ public class DetailFragment extends Fragment implements
 			mLocation = savedInstanceState
 					.getString(DetailActivity.LOCATION_KEY);
 		}
+		// The course version avoids this call if there is no date argument.
+		// In our version, we allow it because the cursor loader will default to today.
 		getLoaderManager().initLoader(DETAIL_LOADER, null, this);
 	}
 
@@ -119,7 +121,10 @@ public class DetailFragment extends Fragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (mLocation != null
+		Bundle arguments = getArguments();
+		if (arguments != null
+				&& arguments.containsKey(DATE_ARGUMENT)
+				&& mLocation != null
 				&& !mLocation.equals(Utility
 						.getPreferredLocation(getActivity()))) {
 			getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
@@ -128,10 +133,8 @@ public class DetailFragment extends Fragment implements
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
+		outState.putString(DetailActivity.LOCATION_KEY, mLocation);
 		super.onSaveInstanceState(outState);
-		if (mLocation != null) {
-			outState.putString(DetailActivity.LOCATION_KEY, mLocation);
-		}
 	}
 
 	private Intent createShareIntent(String text) {
@@ -147,23 +150,20 @@ public class DetailFragment extends Fragment implements
 	// fragment only uses one loader, so we don't care about checking the id.
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-		Intent intent = getActivity().getIntent();
-		if (intent != null) {
-			date = intent.getStringExtra(DetailActivity.DATE_KEY);
+		String dateStr = null;
+		if (getArguments() != null && getArguments().containsKey(DATE_ARGUMENT)) {
+			dateStr = getArguments().getString(DATE_ARGUMENT);
 		}
-		
-		// If no date is provided with the intent, or there was no date, 
-		// default to today. 
-		if (date == null) {
-			date = WeatherContract.getDbDateString(new Date());
+		if (dateStr == null) {
+			dateStr = WeatherContract.getDbDateString(new Date());
 		}
 
-		// Sort order: Ascending, by date.
+		// Sort order: Ascending, by detailDate.
 		String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
 		mLocation = Utility.getPreferredLocation(getActivity());
 		Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithDate(
-				mLocation, date);
+				mLocation, dateStr);
 
 		// Now create and return a CursorLoader that will take care of
 		// creating a Cursor for the data being displayed.
@@ -178,12 +178,13 @@ public class DetailFragment extends Fragment implements
 		clearWidgets();
 		DetailViewHolder viewHolder = getDetailViewHolder();
 		if (cursor.moveToFirst()) {
-			
+
 			// weather condition ID
 			int weatherId = cursor.getInt(COL_WEATHER_WEATHER_ID);
-			
+
 			// Use placeholder image for now
-			viewHolder.iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
+			viewHolder.iconView.setImageResource(Utility
+					.getArtResourceForWeatherCondition(weatherId));
 
 			viewHolder.dayView.setText(Utility.getDayName(context,
 					cursor.getString(COL_WEATHER_DATE)));
