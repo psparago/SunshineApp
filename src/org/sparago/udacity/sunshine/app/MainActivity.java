@@ -36,9 +36,6 @@ public class MainActivity extends ActionBarActivity implements
 						.add(R.id.container, forecastFragment).commit();
 			}
 		}
-		// Set this activity as the forecast item selected listener on the
-		// forecast fragment
-		forecastFragment.setForecastListener(this);
 
 		// The detail container view will be present only in the large-screen
 		// layouts. If this view is present, then the activity should be

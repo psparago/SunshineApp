@@ -61,16 +61,11 @@ public class ForecastFragment extends Fragment implements
 	public static final int COL_LOCATION_COORD_LONG = 1;
 
 	private ForecastCursorAdapter forecastAdapter = null;
-	private ForecastItemSelectedListener forecastItemSelectedListener;
 	private String mLocation;
 	private float currentLongitude;
 	private float currentLatitude;
 
 	public ForecastFragment() {
-	}
-
-	public void setForecastListener(ForecastItemSelectedListener listener) {
-		forecastItemSelectedListener = listener;
 	}
 
 	@Override
@@ -105,8 +100,8 @@ public class ForecastFragment extends Fragment implements
 					int position, long id) {
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
 				if (c.moveToPosition(position)
-						&& forecastItemSelectedListener != null) {
-					forecastItemSelectedListener.onForecastItemSelected(c
+						&& getActivity() instanceof ForecastItemSelectedListener) {
+					((ForecastItemSelectedListener)getActivity()).onForecastItemSelected(c
 							.getString(COL_WEATHER_DATE));
 				}
 			}
