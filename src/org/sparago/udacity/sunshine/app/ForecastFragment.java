@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 public class ForecastFragment extends Fragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String SELECTED_POSITION_KEY = "selectedPosition";
 	private static final int FORECAST_LOADER = 0;
 
 	// Callback interface to notify when a forecast item is selected.
@@ -63,6 +64,9 @@ public class ForecastFragment extends Fragment implements
 	private ForecastCursorAdapter forecastAdapter = null;
 	private String mLocation;
 
+	private ListView listView;
+	private int selectedPosition = ListView.INVALID_POSITION;
+
 	public ForecastFragment() {
 	}
 
@@ -87,14 +91,14 @@ public class ForecastFragment extends Fragment implements
 		forecastAdapter = new ForecastCursorAdapter(getActivity(), null,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
-		ListView listView = (ListView) rootView
-				.findViewById(R.id.listview_forecast);
+		listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 		listView.setAdapter(forecastAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				selectedPosition = position;
 				Cursor c = ((CursorAdapter) parent.getAdapter()).getCursor();
 				if (c.moveToPosition(position)
 						&& getActivity() instanceof ForecastItemSelectedListener) {
@@ -104,7 +108,22 @@ public class ForecastFragment extends Fragment implements
 				}
 			}
 		});
+
+		// if there's a saved selected position, restore it
+		if (savedInstanceState != null
+				&& savedInstanceState.containsKey(SELECTED_POSITION_KEY)) {
+			selectedPosition = savedInstanceState.getInt(SELECTED_POSITION_KEY);
+		}
+
 		return rootView;
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		if (selectedPosition != ListView.INVALID_POSITION) {
+			outState.putInt(SELECTED_POSITION_KEY, selectedPosition);
+		}
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -175,10 +194,8 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		// To only show current and future dates, get the String
-		// representation
-		// for today,
-		// and filter the query to return weather only for dates after or
-		// including today.
+		// representation for today, and filter the query to
+		// return weather only for dates after or including today.
 		// Only return data after today.
 		String startDate = WeatherContract.getDbDateString(new Date());
 
@@ -198,6 +215,9 @@ public class ForecastFragment extends Fragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		forecastAdapter.swapCursor(cursor);
+		if (selectedPosition != ListView.INVALID_POSITION) {
+			listView.setSelection(selectedPosition);
+		}
 	}
 
 	@Override

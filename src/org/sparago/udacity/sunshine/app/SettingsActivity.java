@@ -3,6 +3,9 @@ package org.sparago.udacity.sunshine.app;
 import org.sparago.udacity.sunshine.app.R;
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -80,4 +83,12 @@ public class SettingsActivity extends PreferenceActivity
         return true;
     }
  
+    // Gets the parent activity intent for the up button behavior
+    // Use flag that indicates if the main activity is already running, 
+    // use that one and don't create a new one.
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public Intent getParentActivityIntent() {
+    	return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
 }
