@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
-import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
 import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,12 +58,19 @@ public class ForecastFragment extends Fragment implements
 	// Indexes of columns above (LOCATION_COLUMNS). Must sync.
 	public static final int COL_LOCATION_COORD_LAT = 0;
 	public static final int COL_LOCATION_COORD_LONG = 1;
+	public static final String TWO_PANE_ARG = "twoPaneArg";
 
 	private ForecastCursorAdapter forecastAdapter = null;
 	private String mLocation;
 
 	private ListView listView;
 	private int selectedPosition = ListView.INVALID_POSITION;
+	
+	private boolean isTwoPane;
+	
+	public void setIsTwoPane(boolean isTwoPane) {
+		this.isTwoPane = isTwoPane;
+	}
 
 	public ForecastFragment() {
 	}
@@ -90,7 +95,7 @@ public class ForecastFragment extends Fragment implements
 
 		forecastAdapter = new ForecastCursorAdapter(getActivity(), null,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-
+		
 		listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 		listView.setAdapter(forecastAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -214,6 +219,7 @@ public class ForecastFragment extends Fragment implements
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		forecastAdapter.setUseTodayLayout(!isTwoPane);
 		forecastAdapter.swapCursor(cursor);
 		if (selectedPosition != ListView.INVALID_POSITION) {
 			listView.setSelection(selectedPosition);

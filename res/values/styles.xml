@@ -1,22 +1,28 @@
 <resources>
-
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+ 
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine</item>
     </style>
-
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+ 
+    <!-- ActionBar style -->
+    <style name="ActionBar.Solid.Sunshine"
+        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/sunshine_blue</item>
     </style>
-    
+ 
+    <!-- Main activity theme -->
+    <style name="ForecastTheme" parent="AppTheme">
+        <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>
+    </style>
+ 
+    <!-- Main activity action bar style -->
+    <style name="ActionBar.Solid.Sunshine.NoTitle"
+           parent="@style/ActionBar.Solid.Sunshine">
+        <item name="displayOptions">useLogo|showHome</item>
+        <item name="logo">@drawable/ic_logo</item>
+    </style>    
+
     <style name="ForecastListStyle">
         <!-- Here it's a stub. In sreens of sufficient width this will set single choice mode
         		for two pane layout -->

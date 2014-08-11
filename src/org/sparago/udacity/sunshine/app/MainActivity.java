@@ -53,6 +53,10 @@ public class MainActivity extends ActionBarActivity implements
 		} else {
 			mTwoPane = false;
 		}
+		
+		if (forecastFragment != null) {
+			forecastFragment.setIsTwoPane(mTwoPane);
+		}
 	}
 
 	@Override
