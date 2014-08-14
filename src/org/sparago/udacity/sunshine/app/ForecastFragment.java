@@ -203,7 +203,10 @@ public class ForecastFragment extends Fragment implements
 		// return weather only for dates after or including today.
 		// Only return data after today.
 		String startDate = WeatherContract.getDbDateString(new Date());
-
+		if (isTwoPane) {
+			selectedPosition = 0;
+		}
+		
 		// Sort order: Ascending, by date.
 		String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
