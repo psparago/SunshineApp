@@ -225,6 +225,12 @@ public class ForecastFragment extends Fragment implements
 		forecastAdapter.setUseTodayLayout(!isTwoPane);
 		forecastAdapter.swapCursor(cursor);
 		if (selectedPosition != ListView.INVALID_POSITION) {
+			// Set the first item as selected if nothing is checked and
+			// the list is in single choice mode (i.e. tablet mode)
+			if (listView.getChoiceMode() == ListView.CHOICE_MODE_SINGLE
+					&& listView.getCheckedItemPosition() == ListView.INVALID_POSITION) {
+				listView.setItemChecked(selectedPosition, true);
+			}
 			listView.setSelection(selectedPosition);
 		}
 	}
