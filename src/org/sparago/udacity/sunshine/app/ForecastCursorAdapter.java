@@ -54,12 +54,6 @@ public class ForecastCursorAdapter extends CursorAdapter {
 		// Read weather icon ID from cursor
 		int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_WEATHER_ID);
 
-		// Use placeholder image for now
-		viewHolder.iconView
-				.setImageResource(viewType == VIEW_TYPE_TODAY ? Utility
-						.getArtResourceForWeatherCondition(weatherId) : Utility
-						.getIconResourceForWeatherCondition(weatherId));
-
 		// Read date from cursor
 		String dateString = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
 		viewHolder.dateView.setText(Utility.getFriendlyDayString(context, dateString, useTodayLayout));
@@ -68,6 +62,14 @@ public class ForecastCursorAdapter extends CursorAdapter {
 		String description = cursor
 				.getString(ForecastFragment.COL_WEATHER_DESC);
 		viewHolder.descriptionView.setText(description);
+
+		// Use placeholder image for now
+		viewHolder.iconView
+				.setImageResource(viewType == VIEW_TYPE_TODAY ? Utility
+						.getArtResourceForWeatherCondition(weatherId) : Utility
+						.getIconResourceForWeatherCondition(weatherId));
+		// accessibility
+		viewHolder.iconView.setContentDescription(description);
 
 		// Read user preference for metric or imperial temperature units
 		boolean isFarenheit = Utility.isFarenheit(context);

@@ -179,20 +179,21 @@ public class DetailFragment extends Fragment implements
 		DetailViewHolder viewHolder = getDetailViewHolder();
 		if (cursor.moveToFirst()) {
 
-			// weather condition ID
-			int weatherId = cursor.getInt(COL_WEATHER_WEATHER_ID);
-
-			// Use placeholder image for now
-			viewHolder.iconView.setImageResource(Utility
-					.getArtResourceForWeatherCondition(weatherId));
-
 			viewHolder.dayView.setText(Utility.getDayName(context,
 					cursor.getString(COL_WEATHER_DATE)));
 
 			viewHolder.dateView.setText(Utility.getFormattedMonthDay(context,
 					cursor.getString(COL_WEATHER_DATE)));
 
-			viewHolder.forecastView.setText(cursor.getString(COL_WEATHER_DESC));
+			String description = cursor.getString(COL_WEATHER_DESC);
+			viewHolder.forecastView.setText(description);
+
+			// weather condition ID
+			int weatherId = cursor.getInt(COL_WEATHER_WEATHER_ID);
+			viewHolder.iconView.setImageResource(Utility
+					.getArtResourceForWeatherCondition(weatherId));
+			// accessibility
+			viewHolder.iconView.setContentDescription(description);
 
 			boolean farenheit = Utility.isFarenheit(getActivity());
 			viewHolder.highView.setText(Utility.formatTemperature(context,
