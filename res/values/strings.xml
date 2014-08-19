@@ -33,7 +33,10 @@
         <item>C</item>
         <item>F</item>
     </string-array>
- 
+	
+	<!-- Wind Speed label [CHAR LIMIT=20] -->
+	<string name="windSpeed">Wind Speed</string>
+    
 	<!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
 	<string name="today">Today</string>
  
