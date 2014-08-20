@@ -6,6 +6,7 @@ import java.util.Locale;
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
+import org.sparago.udacity.sunshine.app.service.SunshineService;
 import org.sparago.udacity.sunshine.app.R;
 
 import android.content.Intent;
@@ -65,9 +66,9 @@ public class ForecastFragment extends Fragment implements
 
 	private ListView listView;
 	private int selectedPosition = ListView.INVALID_POSITION;
-	
+
 	private boolean isTwoPane;
-	
+
 	public void setIsTwoPane(boolean isTwoPane) {
 		this.isTwoPane = isTwoPane;
 	}
@@ -95,7 +96,7 @@ public class ForecastFragment extends Fragment implements
 
 		forecastAdapter = new ForecastCursorAdapter(getActivity(), null,
 				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-		
+
 		listView = (ListView) rootView.findViewById(R.id.listview_forecast);
 		listView.setAdapter(forecastAdapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -191,7 +192,9 @@ public class ForecastFragment extends Fragment implements
 
 	private void updateWeather() {
 		mLocation = Utility.getPreferredLocation(getActivity());
-		new FetchWeatherTask(getActivity()).execute(mLocation);
+		Intent intent = new Intent(getActivity(), SunshineService.class)
+								.putExtra(SunshineService.INTENT_LOCATION_KEY, mLocation);
+		getActivity().startService(intent);
 	}
 
 	// This is called when a new Loader needs to be created. This
@@ -206,7 +209,7 @@ public class ForecastFragment extends Fragment implements
 		if (isTwoPane) {
 			selectedPosition = 0;
 		}
-		
+
 		// Sort order: Ascending, by date.
 		String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 

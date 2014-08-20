@@ -1,4 +1,4 @@
-package org.sparago.udacity.sunshine.app;
+package org.sparago.udacity.sunshine.app.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,25 +15,27 @@ import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 import org.sparago.udacity.sunshine.app.models.weather.Day;
 import org.sparago.udacity.sunshine.app.models.weather.WeatherLocation;
 
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
-// To Call: new FetchWeatherTask(this).execute(value);	// value is location        	
-public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
-	private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-	private Context context;
+public class SunshineService extends IntentService {
+	private final String LOG_TAG = SunshineService.class.getSimpleName();
 	
-	public FetchWeatherTask(Context context) {
-		this.context = context;
+	public final static String INTENT_LOCATION_KEY = "locationKey";
+	
+	public SunshineService() {
+		super("SunshineService");
 	}
 
 	@Override
-	protected WeatherLocation doInBackground(String... params) {
+	protected void onHandleIntent(Intent intent) {
 		final String baseUrl = "http://api.openweathermap.org/data/2.5/forecast/daily";
 		final String queryParam = "q";
 		final String modeParam = "mode";
@@ -43,10 +45,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 		final String daysParam = "cnt";
 		final int daysValue = 14;
 
-		if (params.length == 0) {
-			return null;
-		}
-		String locationSetting = params[0];
+		String locationSetting = intent.getStringExtra(INTENT_LOCATION_KEY);
 
 		WeatherLocation location = null;
 
@@ -116,12 +115,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 				}
 			}
 		}
-		return location;
 
-	}
-
-	@Override
-	protected void onPostExecute(WeatherLocation weatherLocation) {
 	}
 
 	private long addLocation(WeatherLocation location) {
@@ -129,7 +123,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 		long locationRowId = 0;
 		Cursor cursor = null;
 		try {
-			cursor = context.getContentResolver().query(
+			cursor = getContentResolver().query(
 					LocationEntry.CONTENT_URI,
 					new String[] { LocationEntry._ID },
 					LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
@@ -150,7 +144,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 				locationValues.put(LocationEntry.COLUMN_COORD_LONG, location
 						.getCity().getCoord().getLongitude());
 
-				Uri locationInsertUri = context.getContentResolver().insert(
+				Uri locationInsertUri = getContentResolver().insert(
 						LocationEntry.CONTENT_URI, locationValues);
 				locationRowId = ContentUris.parseId(locationInsertUri);
 				Log.v(LOG_TAG, "inserted location: " + location.getLocation()
@@ -166,7 +160,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 	private void addDays(WeatherLocation location, long locationId) {
 		Log.v(LOG_TAG, "adding weather days for location " + location.getLocation());
 		
-		int rowsDeleted = context.getContentResolver().delete(
+		int rowsDeleted = getContentResolver().delete(
 				WeatherContract.WeatherEntry.CONTENT_URI,
 				WeatherContract.WeatherEntry.COLUMN_LOC_KEY + " = ?",
 				new String[] { Long.toString(locationId) });
@@ -193,8 +187,16 @@ public class FetchWeatherTask extends AsyncTask<String, Void, WeatherLocation> {
 					.getId());
 			cvs.add(weatherValues);
 		}
-		context.getContentResolver().bulkInsert(
+		getContentResolver().bulkInsert(
 				WeatherContract.WeatherEntry.CONTENT_URI,
 				cvs.toArray(new ContentValues[cvs.size()]));
+	}
+
+	public static class AlarmReceiver extends BroadcastReceiver
+	{
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+		}
 	}
 }
