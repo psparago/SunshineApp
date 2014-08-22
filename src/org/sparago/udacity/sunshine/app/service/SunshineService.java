@@ -27,9 +27,9 @@ import android.util.Log;
 
 public class SunshineService extends IntentService {
 	private final String LOG_TAG = SunshineService.class.getSimpleName();
-	
+
 	public final static String INTENT_LOCATION_KEY = "locationKey";
-	
+
 	public SunshineService() {
 		super("SunshineService");
 	}
@@ -123,8 +123,7 @@ public class SunshineService extends IntentService {
 		long locationRowId = 0;
 		Cursor cursor = null;
 		try {
-			cursor = getContentResolver().query(
-					LocationEntry.CONTENT_URI,
+			cursor = getContentResolver().query(LocationEntry.CONTENT_URI,
 					new String[] { LocationEntry._ID },
 					LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
 					new String[] { location.getLocation() }, null // sort order
@@ -158,14 +157,16 @@ public class SunshineService extends IntentService {
 	}
 
 	private void addDays(WeatherLocation location, long locationId) {
-		Log.v(LOG_TAG, "adding weather days for location " + location.getLocation());
-		
+		Log.v(LOG_TAG,
+				"adding weather days for location " + location.getLocation());
+
 		int rowsDeleted = getContentResolver().delete(
 				WeatherContract.WeatherEntry.CONTENT_URI,
 				WeatherContract.WeatherEntry.COLUMN_LOC_KEY + " = ?",
 				new String[] { Long.toString(locationId) });
-		Log.v(LOG_TAG, "deleted " + rowsDeleted + " weather days for location " + location.getLocation());
-		
+		Log.v(LOG_TAG, "deleted " + rowsDeleted + " weather days for location "
+				+ location.getLocation());
+
 		List<ContentValues> cvs = new ArrayList<ContentValues>();
 		List<Day> days = location.getDays();
 		for (Day day : days) {
@@ -192,11 +193,13 @@ public class SunshineService extends IntentService {
 				cvs.toArray(new ContentValues[cvs.size()]));
 	}
 
-	public static class AlarmReceiver extends BroadcastReceiver
-	{
+	public static class AlarmReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
+			String location = intent
+					.getStringExtra(SunshineService.INTENT_LOCATION_KEY);
+			context.startService(new Intent(context, SunshineService.class)
+					.putExtra(SunshineService.INTENT_LOCATION_KEY, location));
 		}
 	}
 }

@@ -9,10 +9,14 @@ import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 import org.sparago.udacity.sunshine.app.service.SunshineService;
 import org.sparago.udacity.sunshine.app.R;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -192,9 +196,16 @@ public class ForecastFragment extends Fragment implements
 
 	private void updateWeather() {
 		mLocation = Utility.getPreferredLocation(getActivity());
-		Intent intent = new Intent(getActivity(), SunshineService.class)
-								.putExtra(SunshineService.INTENT_LOCATION_KEY, mLocation);
-		getActivity().startService(intent);
+
+		Intent intent = new Intent(getActivity(),
+				SunshineService.AlarmReceiver.class).putExtra(
+				SunshineService.INTENT_LOCATION_KEY, mLocation);
+
+		PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(),
+				0, intent, PendingIntent.FLAG_ONE_SHOT);
+		((AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE))
+				.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+						SystemClock.elapsedRealtime() + 5 * 1000, alarmIntent);
 	}
 
 	// This is called when a new Loader needs to be created. This
