@@ -7,6 +7,7 @@ import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.LocationEntry;
 import org.sparago.udacity.sunshine.app.data.WeatherContract.WeatherEntry;
 import org.sparago.udacity.sunshine.app.service.SunshineService;
+import org.sparago.udacity.sunshine.app.sync.SunshineSyncAdapter;
 import org.sparago.udacity.sunshine.app.R;
 
 import android.app.AlarmManager;
@@ -206,6 +207,8 @@ public class ForecastFragment extends Fragment implements
 		((AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE))
 				.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 						SystemClock.elapsedRealtime() + 5 * 1000, alarmIntent);
+		
+		SunshineSyncAdapter.syncImmediately(getActivity());
 	}
 
 	// This is called when a new Loader needs to be created. This
