@@ -197,7 +197,10 @@ public class ForecastFragment extends Fragment implements
 
 	private void updateWeather() {
 		mLocation = Utility.getPreferredLocation(getActivity());
-
+		SunshineSyncAdapter.syncImmediately(getActivity());
+	}
+	
+	private void updateWeatherByAlarmBroadcast() {
 		Intent intent = new Intent(getActivity(),
 				SunshineService.AlarmReceiver.class).putExtra(
 				SunshineService.INTENT_LOCATION_KEY, mLocation);
@@ -207,8 +210,6 @@ public class ForecastFragment extends Fragment implements
 		((AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE))
 				.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 						SystemClock.elapsedRealtime() + 5 * 1000, alarmIntent);
-		
-		SunshineSyncAdapter.syncImmediately(getActivity());
 	}
 
 	// This is called when a new Loader needs to be created. This

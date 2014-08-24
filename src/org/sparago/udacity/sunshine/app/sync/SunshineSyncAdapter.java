@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.sparago.udacity.sunshine.app.R;
+import org.sparago.udacity.sunshine.app.Utility;
+import org.sparago.udacity.sunshine.app.WeatherFetcher;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 	private static final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
@@ -23,6 +25,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 	public void onPerformSync(Account account, Bundle extras, String authority,
 			ContentProviderClient provider, SyncResult syncResult) {
 		Log.d(LOG_TAG, "onPerformSync called");
+		String location = Utility.getPreferredLocation(getContext());
+		WeatherFetcher.fetchWeather(getContext(), location);
 	}
 
     /**
