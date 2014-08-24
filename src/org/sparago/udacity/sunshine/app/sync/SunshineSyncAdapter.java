@@ -17,6 +17,11 @@ import org.sparago.udacity.sunshine.app.WeatherFetcher;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 	private static final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
 	
+	// Interval at which to sync with the weather, in milliseconds.
+	// 60 seconds (1 minute) * 180 = 3 hours
+	public static final int SYNC_INTERVAL = 60 * 180;
+	public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+	
 	public SunshineSyncAdapter(Context context, boolean autoInitialize) {
 		super(context, autoInitialize);
 	}
@@ -40,7 +45,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         ContentResolver.requestSync(getSyncAccount(context),
                 context.getString(R.string.content_authority), bundle);
     }
- 
+    
     /**
      * Helper method to get the fake account to be used with SyncAdapter, or make a new one
      * if the fake account doesn't exist yet.  If we make a new account, we call the
@@ -74,9 +79,28 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
              * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
              * here.
              */
- 
+            onAccountCreated(newAccount, context);
  
         }
         return newAccount;
+    }
+    
+    /**
+     * Helper method to schedule the sync adapter periodic execution
+     */
+    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+    	Account account = getSyncAccount(context);
+    	String authority = context.getString(R.string.content_authority);
+    	ContentResolver.addPeriodicSync(account, authority, new Bundle(), syncInterval);
+    }
+    
+    private static void onAccountCreated(Account newAccount, Context context) {
+    	SunshineSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
+    	ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+    	syncImmediately(context);
+    }
+    
+    public static void initializeSyncAdapter(Context context) {
+    	getSyncAccount(context);
     }
 }

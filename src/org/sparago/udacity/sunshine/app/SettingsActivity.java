@@ -3,6 +3,7 @@ package org.sparago.udacity.sunshine.app;
 import org.sparago.udacity.sunshine.app.R;
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
 import org.sparago.udacity.sunshine.app.service.SunshineService;
+import org.sparago.udacity.sunshine.app.sync.SunshineSyncAdapter;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -63,9 +64,7 @@ public class SettingsActivity extends PreferenceActivity
  
         if (!mBindingPreference) {
         	if (preference.getKey().equals(getString(R.string.pref_location_key))) {
-        		Intent intent = new Intent(this, SunshineService.class)
-								.putExtra(SunshineService.INTENT_LOCATION_KEY, stringValue);
-        		startService(intent);
+        		SunshineSyncAdapter.syncImmediately(this);
         	} else {
         		getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         	}

@@ -1,6 +1,7 @@
 package org.sparago.udacity.sunshine.app;
 
 import org.sparago.udacity.sunshine.app.R;
+import org.sparago.udacity.sunshine.app.sync.SunshineSyncAdapter;
 
 import android.support.v7.app.ActionBarActivity;
 import android.content.Intent;
@@ -57,6 +58,9 @@ public class MainActivity extends ActionBarActivity implements
 		if (forecastFragment != null) {
 			forecastFragment.setIsTwoPane(mTwoPane);
 		}
+		
+		// make sure we've gotten an account created and we're syncing
+		SunshineSyncAdapter.initializeSyncAdapter(this);
 	}
 
 	@Override
