@@ -68,7 +68,7 @@
         
         <!-- SyncAdapter's dummy authentication service -->
         <service
-            android:name=".sync.SunshineAuthenticationService">
+            android:name=".sync.SunshineAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
