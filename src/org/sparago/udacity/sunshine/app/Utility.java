@@ -33,10 +33,9 @@ public class Utility {
 				.equals("F");
 	}
 
-	static String formatTemperature(Context context, double temperature,
-			boolean isFarenheit) {
+	public static String formatTemperature(Context context, double temperature) {
 		double temp;
-		if (isFarenheit) {
+		if (isFarenheit(context)) {
 			temp = 9 * temperature / 5 + 32;
 		} else {
 			temp = temperature;
@@ -44,7 +43,7 @@ public class Utility {
 		return context.getString(R.string.format_temperature, temp);
 	}
 
-	static String formatDate(String dateString) {
+	public static String formatDate(String dateString) {
 		Date date = WeatherContract.getDateFromDb(dateString);
 		return DateFormat.getDateInstance().format(date);
 	}

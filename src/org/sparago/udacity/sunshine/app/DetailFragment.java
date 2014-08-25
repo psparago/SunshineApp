@@ -195,11 +195,10 @@ public class DetailFragment extends Fragment implements
 			// accessibility
 			viewHolder.iconView.setContentDescription(description);
 
-			boolean farenheit = Utility.isFarenheit(getActivity());
 			viewHolder.highView.setText(Utility.formatTemperature(context,
-					cursor.getDouble(COL_WEATHER_MAX_TEMP), farenheit));
+					cursor.getDouble(COL_WEATHER_MAX_TEMP)));
 			viewHolder.lowView.setText(Utility.formatTemperature(context,
-					cursor.getDouble(COL_WEATHER_MIN_TEMP), farenheit));
+					cursor.getDouble(COL_WEATHER_MIN_TEMP)));
 
 			viewHolder.humidityView.setText(context.getString(
 					R.string.format_humidity,

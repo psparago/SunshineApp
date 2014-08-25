@@ -71,15 +71,12 @@ public class ForecastCursorAdapter extends CursorAdapter {
 		// accessibility
 		viewHolder.iconView.setContentDescription(description);
 
-		// Read user preference for metric or imperial temperature units
-		boolean isFarenheit = Utility.isFarenheit(context);
-
 		// Read high temperature from cursor
 		float high = cursor.getFloat(ForecastFragment.COL_WEATHER_MAX_TEMP);
-		viewHolder.hiTempView.setText(Utility.formatTemperature(context, high, isFarenheit));
+		viewHolder.hiTempView.setText(Utility.formatTemperature(context, high));
 
 		// Read low temperature from cursor
 		float low = cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP);
-		viewHolder.lowTempView.setText(Utility.formatTemperature(context, low, isFarenheit));
+		viewHolder.lowTempView.setText(Utility.formatTemperature(context, low));
 	}
 }
