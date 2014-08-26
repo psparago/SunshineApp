@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.sparago.udacity.sunshine.app.data.WeatherContract;
@@ -24,9 +25,9 @@ import android.util.Log;
 
 public class WeatherFetcher {
 	private static final String LOG_TAG = WeatherFetcher.class.getSimpleName();
-	
+
 	public static void fetchWeather(Context context, String location) {
-		
+
 		final String baseUrl = "http://api.openweathermap.org/data/2.5/forecast/daily";
 		final String queryParam = "q";
 		final String modeParam = "mode";
@@ -93,6 +94,7 @@ public class WeatherFetcher {
 
 			long locationId = addLocation(context, weatherLocation);
 			addDays(context, weatherLocation, locationId);
+			removeOldWeatherData(context);
 
 		} catch (Exception e) {
 			Log.e(LOG_TAG, "Error getting weather JSON", e);
@@ -150,15 +152,18 @@ public class WeatherFetcher {
 		}
 	}
 
-	private static void addDays(Context context, WeatherLocation location, long locationId) {
-		Log.v(LOG_TAG, "adding weather days for location " + location.getLocation());
-		
+	private static void addDays(Context context, WeatherLocation location,
+			long locationId) {
+		Log.v(LOG_TAG,
+				"adding weather days for location " + location.getLocation());
+
 		int rowsDeleted = context.getContentResolver().delete(
 				WeatherContract.WeatherEntry.CONTENT_URI,
 				WeatherContract.WeatherEntry.COLUMN_LOC_KEY + " = ?",
 				new String[] { Long.toString(locationId) });
-		Log.v(LOG_TAG, "deleted " + rowsDeleted + " weather days for location " + location.getLocation());
-		
+		Log.v(LOG_TAG, "deleted " + rowsDeleted + " weather days for location "
+				+ location.getLocation());
+
 		List<ContentValues> cvs = new ArrayList<ContentValues>();
 		List<Day> days = location.getDays();
 		for (Day day : days) {
@@ -183,6 +188,17 @@ public class WeatherFetcher {
 		context.getContentResolver().bulkInsert(
 				WeatherContract.WeatherEntry.CONTENT_URI,
 				cvs.toArray(new ContentValues[cvs.size()]));
+	}
+
+	private static void removeOldWeatherData(Context context) {
+		String today = WeatherContract.getDbDateString(new Date());
+		Log.v(LOG_TAG, "Removing weather entries older than: " + today);
+
+		int rows = context.getContentResolver().delete(
+				WeatherEntry.CONTENT_URI,
+				WeatherEntry.COLUMN_DATETEXT + " < ?", new String[] { today });
+		
+		Log.v(LOG_TAG, "Removed: " + rows + " weather entries");
 	}
 
 }
