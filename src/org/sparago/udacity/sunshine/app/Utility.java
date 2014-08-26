@@ -30,7 +30,14 @@ public class Utility {
 				.getDefaultSharedPreferences(context);
 		return sharedPref.getString(
 				context.getString(R.string.pref_temp_units_key), "")
-				.equals("F");
+				.equals("f");
+	}
+	
+	public static boolean isNotifyWeather(Context context) {
+		SharedPreferences sharedPref = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		return sharedPref.getBoolean(
+				context.getString(R.string.pref_weather_notification_key), true);
 	}
 
 	public static String formatTemperature(Context context, double temperature) {

@@ -5,7 +5,6 @@ import java.util.Date;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
@@ -152,6 +151,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
 	private void notifyWeather() {
 		Context context = getContext();
+		
+		if (!Utility.isNotifyWeather(context))
+			return;
 
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);

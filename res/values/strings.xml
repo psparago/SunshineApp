@@ -23,15 +23,26 @@
     <!-- Key name for storing temp units in SharedPreferences [CHAR LIMIT=NONE] -->
     <string name="pref_temp_units_key" translatable="false">tempUnits</string>
     <!-- Default location for temp units preference [CHAR LIMIT=NONE] -->
-    <string name="pref_temp_units_default" translatable="false">f</string>
+    <string name="pref_temp_units_default" translatable="false">F</string>
+    
+    <!-- Label for the weather notification preference [CHAR LIMIT=30] -->
+    <string name="pref_weather_notification_label">Show Weather Notifications</string>
+    <!-- Key name for weather notification in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_weather_notification_key" translatable="false">notifyWeather</string>
+    <!-- Default for showing weather notifications preference [CHAR LIMIT=NONE] -->
+    <string name="pref_weather_notification_default" translatable="false">true</string>
+    
+    <!-- preference used to store the last time we popped up a notification -->
+    <string name="pref_last_notification">last_notification</string>
+    
     
     <string-array name="pref_temp_units_entries">
         <item>Metric</item>
         <item>Imperial</item>
     </string-array>
     <string-array name="pref_temp_units_values">
-        <item>C</item>
-        <item>F</item>
+        <item>c</item>
+        <item>f</item>
     </string-array>
 	
 	<!-- Wind Speed label [CHAR LIMIT=20] -->
@@ -72,7 +83,6 @@
 	<string name="sync_account_type">sunshine.sparago.org</string>
 	<string name="content_authority">org.sparago.udacity.sunshine.app</string>
 	
-	<string name="pref_last_notification">last_notification</string>
 	<string name="format_notification">
 	    Forecast: <xliff:g id="condition">%1$s</xliff:g> High: <xliff:g id="high">%2$s</xliff:g> Low: <xliff:g id="low">%3$s</xliff:g>
 	</string>
